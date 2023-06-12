@@ -1,0 +1,5 @@
+.chroma/*
+**/.chroma/*
+**/__pycache__/*
+.idea/*
+**/lightning_logs/*
