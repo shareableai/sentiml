@@ -7,16 +7,16 @@ from dataclasses import dataclass
 from functools import reduce
 from typing import Optional
 
-from observe_dag.default_libraries import (
+from observer.default_libraries import (
     DEFAULT_LIBS,
     DEV_LIBS,
     LIBS_THAT_ARENT_RELEVANT,
 )
-from observe_dag.inclusion import should_include_module
-from observe_dag.protocols import CodeProtocol
-from observe_dag.stack_element import StackElement
-from observe_dag.trace_id import TraceID
-from observe_dag.tracking_type import TrackingType
+from observer.inclusion import should_include_module
+from observer.protocols import CodeProtocol
+from observer.stack_element import StackElement
+from observer.trace_id import TraceID
+from observer.tracking_type import TrackingType
 
 
 class NodeStack:
@@ -68,9 +68,7 @@ class NodeStack:
 
     def _root_dir(self) -> pathlib.Path:
         root_dir = (
-                pathlib.Path.home()
-                / ".stack_traces"
-                / str(TraceID.id())
+                TraceID.root_dir()
                 / str(self._stack_type)
         )
         root_dir.mkdir(parents=True, exist_ok=True)

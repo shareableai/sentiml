@@ -3,8 +3,8 @@ import torch
 from PIL import Image
 import requests
 
-from observe_dag.trackers import Observer
-from observe_dag.tracking_type import TrackingType
+from observer.trackers import Observer
+from observer.tracking_type import TrackingType
 
 
 url = "http://images.cocodataset.org/val2017/000000039769.jpg"

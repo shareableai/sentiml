@@ -10,20 +10,35 @@ from dataclasses import field, dataclass
 from types import FunctionType
 from typing import Optional, List, TextIO
 
-from observe_dag.inclusion import should_include_module
-from observe_dag.protocols import CodeProtocol, FrameProtocol
-from observe_dag.slugify import slugify
+from observer.inclusion import should_include_module
+from observer.protocols import CodeProtocol, FrameProtocol
+from observer.slugify import slugify
 
 class NotIncludedError(BaseException):
     pass
+
+
+def get_caller_name(argument) -> Optional[str]:
+    if hasattr(argument, '__qualname__') and getattr(argument, '__qualname__') is not None:
+        return argument.__qualname__
+    elif hasattr(argument, '__name__') and getattr(argument, '__name__') is not None:
+        return argument.__name__
+    if hasattr(argument, '__class__'):
+        if hasattr(argument.__class__, '__qualname__') and getattr(argument.__class__, '__qualname__') is not None:
+            return argument.__class__.__qualname__
+        elif hasattr(argument.__class__, '__name__') and getattr(argument.__class__, '__name__') is not None:
+            return argument.__class__.__name__
 
 @dataclass
 class StackElement:
     description: CodeProtocol
     module: str
     parent: Optional[StackElement] = field(default=None)
+    tracked_class_name: Optional[str] = field(default=None)
+    signature: Optional[str] = field(default=None)
     arguments: dict[str, str] = field(default_factory=dict)
     caller_name: Optional[str] = field(default=None)
+    readable_caller_name: Optional[str] = field(default=None)
     caller_docs: Optional[str] = field(default=None)
     children: List[StackElement] = field(default_factory=list)
     _hash: Optional[int] = field(default=None)
@@ -38,6 +53,9 @@ class StackElement:
             source = None
         return {
             "arguments": self.arguments,
+            "tracked_class_name": self.tracked_class_name,
+            "signature": f"def {self.description.co_name}{self.signature}" if self.signature is not None else "",
+            "caller_name": self.readable_caller_name,
             "caller_docs": self.caller_docs,
             "source": source
         }
@@ -76,19 +94,26 @@ class StackElement:
         else:
             parent = None
 
-        argument_names = frame.f_code.co_varnames
+        possible_argument_names = frame.f_code.co_varnames
         arguments = {}
+        readable_caller_name = None
         caller_name = None
         caller_docs = None
-        for argument_name in argument_names:
+        signature = None
+        tracked_class_name = None
+        for argument_name in possible_argument_names:
             if argument_name in frame.f_locals:
                 argument = frame.f_locals[argument_name]
                 if argument_name in ['self', 'cls']:
                     try:
+                        if hasattr(argument, '__observer_class_name__'):
+                            tracked_class_name = argument.__observer_class_name__
                         if hasattr(argument, '__qualname__'):
                             caller_name = argument.__qualname__
                         elif hasattr(argument, '__name__'):
                             caller_name = argument.__name__
+                        if readable_caller_name is None:
+                            readable_caller_name = get_caller_name(argument)                        
                         if hasattr(argument, '__doc__') and getattr(argument, '__doc__') is not None:
                             caller_docs = argument.__doc__
                     except BaseException:
@@ -103,10 +128,9 @@ class StackElement:
             if len(referents) > 0:
                 initial_referent = next(iter(referents))
                 if isinstance(initial_referent, FunctionType):
-                    # TODO: Still missing lots of default args for things like the Preprocessing fn in DETR.
                     signature = inspect.signature(initial_referent)
-                    arguments = {
-                        k: v.default
+                    arguments =  {
+                        k: v.default if v.default is not inspect.Parameter.empty else None
                         for k, v in signature.parameters.items()
                         if v.default is not inspect.Parameter.empty
                     } | arguments
@@ -115,8 +139,11 @@ class StackElement:
             frame.f_code,
             module.__name__ if module is not None else "UnknownModule",
             parent,
+            tracked_class_name,
+            signature,
             arguments,
             caller_name,
+            readable_caller_name,
             caller_docs,
             list(),
         )

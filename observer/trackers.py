@@ -7,12 +7,12 @@ from typing import Optional, Any, Callable, Iterator
 from importlib.metadata import version, PackageNotFoundError
 
 
-from observe_dag.protocols import FrameProtocol
-from observe_dag.stack_element import StackElement, NotIncludedError
-from observe_dag.stack_trace import NodeStack
-from observe_dag.stacks import TrainStack, InferStack, ProcessingStack
-from observe_dag.trace_id import TraceID
-from observe_dag.tracking_type import TrackingType
+from observer.protocols import FrameProtocol
+from observer.stack_element import StackElement, NotIncludedError
+from observer.stack_trace import NodeStack
+from observer.stacks import TrainStack, InferStack, ProcessingStack
+from observer.trace_id import TraceID
+from observer.tracking_type import TrackingType
 
 
 class Observer:
