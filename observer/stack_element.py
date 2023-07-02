@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import functools
+import uuid
 import gc
 import inspect
 import json
@@ -34,9 +35,9 @@ class StackElement:
     description: CodeProtocol
     module: str
     parent: Optional[StackElement] = field(default=None)
-    tracked_class_name: Optional[str] = field(default=None)
     signature: Optional[str] = field(default=None)
-    arguments: dict[str, str] = field(default_factory=dict)
+    argument_values: dict[str, str] = field(default_factory=dict)
+    tracked_argument_ids: dict[str, str] = field(default_factory=dict)
     caller_name: Optional[str] = field(default=None)
     readable_caller_name: Optional[str] = field(default=None)
     caller_docs: Optional[str] = field(default=None)
@@ -52,8 +53,8 @@ class StackElement:
         except BaseException:
             source = None
         return {
-            "arguments": self.arguments,
-            "tracked_class_name": self.tracked_class_name,
+            "arguments": self.argument_values,
+            "tracked_argument_ids": self.tracked_argument_ids,
             "signature": f"def {self.description.co_name}{self.signature}" if self.signature is not None else "",
             "caller_name": self.readable_caller_name,
             "caller_docs": self.caller_docs,
@@ -95,55 +96,62 @@ class StackElement:
             parent = None
 
         possible_argument_names = frame.f_code.co_varnames
-        arguments = {}
+        argument_values = {}
+        tracked_argument_ids = {}
         readable_caller_name = None
         caller_name = None
         caller_docs = None
         signature = None
-        tracked_class_name = None
         for argument_name in possible_argument_names:
             if argument_name in frame.f_locals:
-                argument = frame.f_locals[argument_name]
+                argument_value = frame.f_locals[argument_name]
+                # Present after track_class is called on the class.
+                try:
+                    if (tracked_argument_id := getattr(argument_value, '__observer_class_name__', None)) is not None:
+                        tracked_argument_ids[argument_name] = tracked_argument_id
+                except RecursionError:
+                    try:
+                        if (tracked_argument_id := argument_value.get('__observer_class_name__', None)) is not None:
+                            tracked_argument_ids[argument_name] = tracked_argument_id
+                    except BaseException:
+                        continue
                 if argument_name in ['self', 'cls']:
                     try:
-                        if hasattr(argument, '__observer_class_name__'):
-                            tracked_class_name = argument.__observer_class_name__
-                        if hasattr(argument, '__qualname__'):
-                            caller_name = argument.__qualname__
-                        elif hasattr(argument, '__name__'):
-                            caller_name = argument.__name__
+                        if hasattr(argument_value, '__qualname__'):
+                            caller_name = argument_value.__qualname__
+                        elif hasattr(argument_value, '__name__'):
+                            caller_name = argument_value.__name__
                         if readable_caller_name is None:
-                            readable_caller_name = get_caller_name(argument)                        
-                        if hasattr(argument, '__doc__') and getattr(argument, '__doc__') is not None:
-                            caller_docs = argument.__doc__
+                            readable_caller_name = get_caller_name(argument_value)                        
+                        if hasattr(argument_value, '__doc__') and getattr(argument_value, '__doc__') is not None:
+                            caller_docs = argument_value.__doc__
                     except BaseException:
                         pass
-                if sys.getsizeof(argument) < 512:
+                if sys.getsizeof(argument_value) < 512:
                     try:
-                        arguments[argument_name] = str(argument)
+                        argument_values[argument_name] = str(argument_value)
                     except BaseException:
                         pass
-        if 'self' in arguments or 'cls' in arguments:
+        if 'self' in argument_values or 'cls' in argument_values:
             referents = list(gc.get_referrers(frame.f_code))
             if len(referents) > 0:
                 initial_referent = next(iter(referents))
                 if isinstance(initial_referent, FunctionType):
                     signature = inspect.signature(initial_referent)
-                    arguments =  {
+                    argument_values =  {
                         k: v.default if v.default is not inspect.Parameter.empty else None
                         for k, v in signature.parameters.items()
                         if v.default is not inspect.Parameter.empty
-                    } | arguments
+                    } | argument_values
 
         return StackElement(
-            frame.f_code,
-            module.__name__ if module is not None else "UnknownModule",
-            parent,
-            tracked_class_name,
-            signature,
-            arguments,
-            caller_name,
-            readable_caller_name,
-            caller_docs,
-            list(),
+            description=frame.f_code,
+            module=module.__name__ if module is not None else "UnknownModule",
+            parent=parent,
+            signature=signature,
+            argument_values=argument_values,
+            tracked_argument_ids={k: str(v) for (k, v) in tracked_argument_ids.items()},
+            caller_name=caller_name,
+            readable_caller_name=readable_caller_name,
+            caller_docs=caller_docs,
         )
