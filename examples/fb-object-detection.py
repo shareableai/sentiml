@@ -11,13 +11,13 @@ from observer.track_class import track_class
 if __name__ == "__main__":
     url = "http://images.cocodataset.org/val2017/000000039769.jpg"
     image = Image.open(requests.get(url, stream=True).raw)
-
     processor = DetrImageProcessor.from_pretrained("facebook/detr-resnet-50")
     model = DetrForObjectDetection.from_pretrained("facebook/detr-resnet-50")
 
     Observer.track(TrackingType.Inference)
     track_class(processor)
     track_class(model)
+
     inputs = processor(images=image, return_tensors="pt")
     outputs = model(**inputs)
     # convert outputs (bounding boxes and class logits) to COCO API

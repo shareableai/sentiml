@@ -12,7 +12,7 @@ from functools import partial
 T = TypeVar('T')
 
 
-def track_class(item: T, class_name: Optional[str] = None) -> T:
+def track_class(item: T, class_name: Optional[str] = None) -> None:
     if (existing_class_name := getattr(item, '__observer_class_name__', None)) is not None:
         inner_class_name = existing_class_name
     elif class_name is not None:
@@ -24,14 +24,11 @@ def track_class(item: T, class_name: Optional[str] = None) -> T:
     except BaseException:
         # It's nice to have a consistent name for an object, but it's fairly trivial.
         pass
-    def teardown(self):
-        # Remove teardown function from class
-        setattr(self, '__teardown__', None)
-        res: dict = weave(self).as_dict()
+    def teardown(cls):
+        res: dict = weave(cls).as_dict()
         root_dir = TraceID.root_dir() / 'classes'
         root_dir.mkdir(exist_ok=True, parents=True)
         with open(root_dir / f"{inner_class_name}.json", 'w') as f:
             json.dump(res, f)
-        
-    setattr(item, '__teardown__', teardown)
-    atexit.register(partial(item.__teardown__, self=item))
+
+    atexit.register(partial(teardown, cls=item))

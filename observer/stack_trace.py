@@ -8,8 +8,6 @@ from functools import reduce
 from typing import Optional
 
 from observer.default_libraries import (
-    DEFAULT_LIBS,
-    DEV_LIBS,
     LIBS_THAT_ARENT_RELEVANT,
 )
 from observer.inclusion import should_include_module
@@ -27,7 +25,7 @@ class NodeStack:
         self._max_node_depth = max_depth
 
     def _include_node(self, node: StackElement) -> bool:
-        return (
+        is_included = (
                 node is not None
                 and should_include_module(node.module)
                 and node.description.co_name is not None
@@ -38,6 +36,7 @@ class NodeStack:
                 )
                 and NodeStack.node_depth(node) <= self._max_node_depth
         )
+        return is_included
 
     @staticmethod
     def _node_depth(node: Optional[StackElement], depth: int = 0) -> int:
