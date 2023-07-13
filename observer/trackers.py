@@ -30,7 +30,6 @@ class Observer:
             cls.stop()
         cls._type = tracking_type
         cls._previous_tracking_fn = sys.gettrace()
-
         if tracking_type == TrackingType.Training:
             cls._relevant_tracker = TrainStack
         elif tracking_type == TrackingType.Inference:
@@ -81,4 +80,6 @@ class Observer:
         cls.save_libraries()
         cls._relevant_tracker = None
         sys.settrace(cls._previous_tracking_fn)
+        # Ensure that new StackElements from functions don't share children with previous StackElements.
+        StackElement.from_frame.cache_clear()
         cls._previous_tracking_fn = None

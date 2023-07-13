@@ -18,7 +18,11 @@ from observer.tracking_type import TrackingType
 
 
 class NodeStack:
-    def __init__(self, stack_type: TrackingType, max_depth: int = 6):
+    def __init__(self, stack_type: TrackingType, existing_node_ids: Optional[list[int]] = None, max_depth: int = 6):
+        if existing_node_ids is None:
+            self._existing_node_ids: list[int] = []
+        else:
+            self._existing_node_ids = existing_node_ids
         self._stack_type: TrackingType = stack_type
         self._nodes: list[StackElement] = list()
         self._node_lookup: dict[int, StackElement] = dict()  # Node Hash => Node

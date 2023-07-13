@@ -9,7 +9,7 @@ packages = [{include = "observer"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
-weaver = {path = "../weaver-json"}
+weaver = {path = "../../weaver-json"}
 
 
 [tool.poetry.dev-dependencies]

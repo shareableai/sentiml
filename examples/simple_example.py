@@ -20,7 +20,7 @@ if __name__ == "__main__":
     X_train, X_test, y_train, y_test = train_test_split(
         data, digits.target, test_size=0.5, shuffle=False
     )
-    #Observer.track(TrackingType.Training)
+    Observer.track(TrackingType.Training)
     # Learn the digits on the train subset
     clf.fit(X_train, y_train)
     Observer.track(TrackingType.Inference)
