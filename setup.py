@@ -1,4 +1,4 @@
-import observer
+import sentiml
 import pathlib
 
 from setuptools import setup
@@ -18,13 +18,13 @@ except FileNotFoundError:
 
 
 setup(
-    name=observer.__name__,
-    version=observer.__version__,
-    description=observer.__description__,
+    name=sentiml.__name__,
+    version=sentiml.__version__,
+    description=sentiml.__description__,
     long_description=README,
     long_description_content_type="text/markdown",
     license="MIT",
-    packages=["observer"],
+    packages=["sentiml"],
     requirements=requirements,
     extras_require={"dev": dev_requirements},
 )

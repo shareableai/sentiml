@@ -7,14 +7,14 @@ from dataclasses import dataclass
 from functools import reduce
 from typing import Optional
 
-from observer.default_libraries import (
+from sentiml.default_libraries import (
     LIBS_THAT_ARENT_RELEVANT,
 )
-from observer.inclusion import should_include_module
-from observer.protocols import CodeProtocol
-from observer.stack_element import StackElement
-from observer.trace_id import TraceID
-from observer.tracking_type import TrackingType
+from sentiml.inclusion import should_include_module
+from sentiml.protocols import CodeProtocol
+from sentiml.stack_element import StackElement
+from sentiml.trace_id import TraceID
+from sentiml.tracking_type import TrackingType
 
 
 class NodeStack:

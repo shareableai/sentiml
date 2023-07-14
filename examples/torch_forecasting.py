@@ -12,8 +12,8 @@ from pytorch_forecasting.data.examples import generate_ar_data
 from pytorch_forecasting.metrics import NormalDistributionLoss
 from pytorch_forecasting.models.deepar import DeepAR
 
-from observer.trackers import Observer
-from observer.tracking_type import TrackingType
+from sentiml.trackers import Observer
+from sentiml.tracking_type import TrackingType
 
 warnings.simplefilter("error", category=SettingWithCopyWarning)
 Observer.track(TrackingType.Processing)

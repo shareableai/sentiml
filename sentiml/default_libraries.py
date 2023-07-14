@@ -215,5 +215,5 @@ LIBS_THAT_ARENT_RELEVANT = [
 
 COMMON_NN_LIBS = ["torch", "tensorflow", "PIL", "torchvision", "sklearn", "numpy"]
 
-DEV_LIBS = ["mypy", "pytest", "observer"]
+DEV_LIBS = ["mypy", "pytest", "sentiml"]
 DEV_LIBS = ["_" + name for name in DEV_LIBS] + DEV_LIBS

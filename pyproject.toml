@@ -1,15 +1,15 @@
 [tool.poetry]
-name = "observer"
+name = "sentiml"
 version = "0.0.1"
-description = "Trace ML Models"
+description = "Sentinel for ML Models"
 authors = ["Lissa Hyacinth <lissa@shareableai.com>"]
 license = "LGPL-3.0-or-later"
 readme = "README.md"
-packages = [{include = "observer"}]
+packages = [{include = "sentiml"}]
 
 [tool.poetry.dependencies]
 python = ">=3.10,<3.11"
-weaver = {path = "../../weaver-json"}
+weaver-json = ">=0.0.2"
 
 
 [tool.poetry.dev-dependencies]

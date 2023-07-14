@@ -11,9 +11,9 @@ from dataclasses import field, dataclass
 from types import FunctionType
 from typing import Optional, List, TextIO
 
-from observer.inclusion import should_include_module
-from observer.protocols import CodeProtocol, FrameProtocol
-from observer.slugify import slugify
+from sentiml.inclusion import should_include_module
+from sentiml.protocols import CodeProtocol, FrameProtocol
+from sentiml.slugify import slugify
 
 class NotIncludedError(BaseException):
     pass

@@ -3,9 +3,9 @@ import torch
 from PIL import Image
 import requests
 
-from observer.trackers import Observer
-from observer.tracking_type import TrackingType
-from observer.track_class import track_class
+from sentiml.trackers import Observer
+from sentiml.tracking_type import TrackingType
+from sentiml.track_class import track_class
 
 
 if __name__ == "__main__":

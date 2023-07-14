@@ -7,12 +7,12 @@ from typing import Optional, Any, Callable, Iterator
 from importlib.metadata import version, PackageNotFoundError
 
 
-from observer.protocols import FrameProtocol
-from observer.stack_element import StackElement, NotIncludedError
-from observer.stack_trace import NodeStack
-from observer.stacks import TrainStack, InferStack, ProcessingStack
-from observer.trace_id import TraceID
-from observer.tracking_type import TrackingType
+from sentiml.protocols import FrameProtocol
+from sentiml.stack_element import StackElement, NotIncludedError
+from sentiml.stack_trace import NodeStack
+from sentiml.stacks import TrainStack, InferStack, ProcessingStack
+from sentiml.trace_id import TraceID
+from sentiml.tracking_type import TrackingType
 
 
 class Observer:

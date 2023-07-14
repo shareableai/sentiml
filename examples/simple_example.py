@@ -1,9 +1,9 @@
 from sklearn import datasets, svm
 from sklearn.model_selection import train_test_split
 
-from observer.trackers import Observer
-from observer.tracking_type import TrackingType
-from observer.track_class import track_class
+from sentiml.trackers import Observer
+from sentiml.tracking_type import TrackingType
+from sentiml.track_class import track_class
 
 
 if __name__ == "__main__":

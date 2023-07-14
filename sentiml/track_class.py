@@ -1,7 +1,7 @@
 import json
 import atexit
 
-from observer.trace_id import TraceID
+from sentiml.trace_id import TraceID
 from weaver.weave import weave
 
 from uuid import uuid4

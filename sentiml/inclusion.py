@@ -1,6 +1,6 @@
 from typing import Optional
 
-from observer.default_libraries import DEFAULT_LIBS, DEV_LIBS, LIBS_THAT_ARENT_RELEVANT
+from sentiml.default_libraries import DEFAULT_LIBS, DEV_LIBS, LIBS_THAT_ARENT_RELEVANT
 
 
 def should_include_module(module: Optional[str]) -> bool:

@@ -1,3 +1,3 @@
-# Installation
+# SentiML
 
-Update your pypoetry to point towards the currently non-versioned Weaver repo.
+Trace Machine Learning code.
